@@ -2,15 +2,8 @@ import 'package:flutter/material.dart';
 
 class Tool extends StatelessWidget {
   final Function resetHandler;
-  final int currentX;
-  final int currentY;
-  final int remainingSpot;
 
-  Tool(
-      {@required this.resetHandler,
-      this.currentX,
-      this.currentY,
-      this.remainingSpot});
+  Tool({@required this.resetHandler});
 
   @override
   Widget build(BuildContext context) {
@@ -18,15 +11,17 @@ class Tool extends StatelessWidget {
       children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
           FlatButton(
+            shape: CircleBorder(),
             onPressed: resetHandler,
             color: Colors.blue,
-            padding: EdgeInsets.all(10.0),
-            child: Column(
-              children: <Widget>[Icon(Icons.dashboard), Text("Reset")],
+            textColor: Colors.white,
+            padding: EdgeInsets.all(15.0),
+            child: Icon(
+              Icons.refresh,
+              size: 24,
             ),
           ),
         ]),
-        Text("Spot: $remainingSpot"),
       ],
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import './pegSolitaire/board.dart';
 import './pegSolitaire/tool.dart';
 import './pegSolitaire/finish.dart';
@@ -15,6 +16,7 @@ class _PegSolitaireState extends State<PegSolitaire> {
   int currentX = 0;
   int currentY = 0;
   int remainingSpot = 36;
+  int bestScore = 36;
   bool isFinish = false;
 
   static List<List<dynamic>> originBoard = [
@@ -30,11 +32,11 @@ class _PegSolitaireState extends State<PegSolitaire> {
   // static List<List<dynamic>> originBoard = [
   //   [null, null, 0, 0, 0, null, null],
   //   [null, 0, 0, 0, 0, 0, null],
-  //   [0, 0, 0, 0, 0, 0, 1],
-  //   [0, 0, 0, 0, 1, 1, 0],
-  //   [0, 0, 0, 0, 0, 0, 1],
-  //   [null, 0, 0, 0, 0, 1, null],
-  //   [null, null, 0, 1, 1, null, null],
+  //   [0, 0, 0, 0, 0, 0, 0],
+  //   [0, 0, 1, 1, 0, 0, 0],
+  //   [0, 0, 0, 0, 0, 0, 0],
+  //   [null, 0, 0, 0, 0, 0, null],
+  //   [null, null, 0, 0, 0, null, null],
   // ];
 
   List<List<dynamic>> board =
@@ -81,6 +83,7 @@ class _PegSolitaireState extends State<PegSolitaire> {
           currentY = y;
           remainingSpot--;
           _checkIsFinish();
+          _checkBestScore();
         } else if ((currentY - y).abs() == 2 &&
             currentX == x &&
             board[x][((currentY + y) ~/ 2)] == 1) {
@@ -92,6 +95,7 @@ class _PegSolitaireState extends State<PegSolitaire> {
           currentY = y;
           remainingSpot--;
           _checkIsFinish();
+          _checkBestScore();
         }
       }
     });
@@ -99,23 +103,46 @@ class _PegSolitaireState extends State<PegSolitaire> {
 
   void _checkIsFinish() {
     // check right and down
-    for (int i = 0; i < 7; i++) {
-      for (int j = 0; j < 7; j++) {
-        if (board[i][j] == null || board[i][j] == 0) {
-          continue;
-        }
+    if (!isFinish) {
+      for (int i = 0; i < 7; i++) {
+        for (int j = 0; j < 7; j++) {
+          if (board[i][j] == null || board[i][j] == 0) {
+            continue;
+          }
 
-        if ((i > 2 && board[i - 1][j] == 1 && board[i - 2][j] == 0) ||
-            (i < 5 && board[i + 1][j] == 1 && board[i + 2][j] == 0) ||
-            (j > 2 && board[i][j - 1] == 1 && board[i][j - 2] == 0) ||
-            (j < 5 && board[i][j + 1] == 1 && board[i][j + 2] == 0)) {
-          return;
+          if ((i > 2 && board[i - 1][j] == 1 && board[i - 2][j] == 0) ||
+              (i < 5 && board[i + 1][j] == 1 && board[i + 2][j] == 0) ||
+              (j > 2 && board[i][j - 1] == 1 && board[i][j - 2] == 0) ||
+              (j < 5 && board[i][j + 1] == 1 && board[i][j + 2] == 0)) {
+            return;
+          }
         }
       }
+      isFinish = true;
+      _showFinishDialog();
     }
+  }
 
-    isFinish = true;
-    return;
+  void _showFinishDialog() {
+    showDialog(
+        context: context,
+        builder: (_) => CupertinoAlertDialog(
+              title: Text("Good Job!"),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            ));
+  }
+
+  void _checkBestScore() {
+    if (remainingSpot < bestScore) {
+      bestScore = remainingSpot;
+    }
   }
 
   static Color getRandomColor() {
@@ -125,33 +152,55 @@ class _PegSolitaireState extends State<PegSolitaire> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: <Widget>[
-      Column(children: <Widget>[
-        SizedBox(height: 36.0),
-        AspectRatio(
-            aspectRatio: 1,
-            child: Container(
-                width: double.maxFinite,
-                color: Colors.white,
-                child: Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Board(
-                      currentX: currentX,
-                      currentY: currentY,
-                      board: board,
-                      boardColor: boardColor,
-                      spotHandler: _targetSpot,
-                    )))),
-        SizedBox(height: 24.0),
-        // Tool
-        Tool(
+    return Scaffold(
+        body: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+          Text(
+            "Peg Solitaire",
+            style: TextStyle(
+              fontSize: 40,
+              color: Colors.black,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          RichText(
+            text: TextSpan(
+              style: TextStyle(fontSize: 20, color: Colors.black87),
+              children: <TextSpan>[
+                TextSpan(
+                    text: '$remainingSpot',
+                    style: TextStyle(fontSize: 48, color: Colors.black)),
+                TextSpan(text: ' spots'),
+              ],
+            ),
+          ),
+          Text(
+            "Best score: $bestScore",
+            style: TextStyle(fontSize: 16, color: Colors.black87),
+          ),
+          SizedBox(height: 36.0),
+          AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                  width: double.maxFinite,
+                  color: Colors.white,
+                  child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Board(
+                        currentX: currentX,
+                        currentY: currentY,
+                        board: board,
+                        boardColor: boardColor,
+                        spotHandler: _targetSpot,
+                      )))),
+          //SizedBox(height: 24.0),
+          // Tool
+          Tool(
             resetHandler: _restartBoard,
-            currentX: currentX,
-            currentY: currentY,
-            remainingSpot: remainingSpot),
-        SizedBox(height: 12.0),
-        isFinish ? Finish(newGameHandler: _restartBoard) : Container()
-      ])
-    ]);
+          ),
+          //SizedBox(height: 12.0),
+        ]));
   }
 }

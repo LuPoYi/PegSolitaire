@@ -20,13 +20,13 @@ class Login extends StatelessWidget {
 
     return Scaffold(
         body: Container(
-      decoration: BoxDecoration(
-          color: new Color(0xff644F74),
-          gradient: LinearGradient(
-            colors: [new Color(0xff29aaa7), new Color(0xff3bbbd)],
-            begin: Alignment.centerRight,
-            end: Alignment.centerLeft,
-          )),
+      // decoration: BoxDecoration(
+      //     color: new Color(0xff644F74),
+      //     gradient: LinearGradient(
+      //       colors: [new Color(0xff29aaa7), new Color(0xff3bbbd)],
+      //       begin: Alignment.centerRight,
+      //       end: Alignment.centerLeft,
+      //     )),
       child: Center(
         child: ListView(
           shrinkWrap: true,
